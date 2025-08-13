@@ -9,7 +9,7 @@ import (
 
 // GetChar reads a single character from stdin and returns it
 func GetChar() (byte, error) {
-	termios, err := unix.IoctlGetTermios(int(unix.Stdin), unix.TIOCGETA)
+	termios, err := unix.IoctlGetTermios(int(unix.Stdin), unix.TCGETS)
 	if err != nil {
 		if err == unix.ENOTTY {
 			return 0, nil
@@ -27,11 +27,11 @@ func GetChar() (byte, error) {
 	termios.Cc[unix.VMIN] = 1
 	termios.Cc[unix.VTIME] = 0
 
-	if err := unix.IoctlSetTermios(int(unix.Stdin), unix.TIOCSETA, termios); err != nil {
+	if err := unix.IoctlSetTermios(int(unix.Stdin), unix.TCSETS, termios); err != nil {
 		return 0, err
 	}
 
-	defer unix.IoctlSetTermios(int(unix.Stdin), unix.TIOCSETA, &oldTermios)
+	defer unix.IoctlSetTermios(int(unix.Stdin), unix.TCSETS, &oldTermios)
 
 	var buf [1]byte
 
